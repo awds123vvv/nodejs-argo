@@ -11,12 +11,17 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+env:
+  # 可选：立即切换 Actions 中的 JavaScript actions 到 Node.js 24（如你愿意）
+  # FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+      id-token: write
 
     steps:
       - name: Checkout repository
@@ -27,7 +32,8 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          # 推荐使用一个 PAT，确保包含 write:packages（或 packages:write）scope（如果是私有仓库，还需 repo scope）
+          password: ${{ secrets.GHCR_PAT }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
